@@ -1,6 +1,6 @@
-use std::{io::Cursor, fs::File, path::Path, os, error::Error};
-use packs::{Pack, Unpack};
-use std::io::prelude::*;
+use std::{io::prelude::*, fs::File, path::Path/*, error::Error*/};
+//use packs::{Pack, Unpack};
+use std::process::Command;
 
 //Declarando los clusters como globales y mutables
 static mut CLUSTERS: Vec<u8> = Vec::new();
@@ -13,27 +13,22 @@ fn sistema() {
 	// Haciendo comparación con match para montar el sistema de archivos
 	let mut file = match File::open(path) {
 		// Si no se ha podido montar, se muestra el aviso y el tipo de error
-		Err(e) => panic!("No se ha podido montar {}: {}", path.display(), e.description()),
+		Err(e) => panic!("\n\tNo se ha podido montar {}: {}", path.display(), e.to_string()),
 		Ok(file) => file,
 	};
 	// Para poder usar las variables estáticas mutables -y globales- se tiene que usar 'unsafe'
 	unsafe { 
-		file.read_to_end(&mut CLUSTERS);
+		match file.read_to_end(&mut CLUSTERS) {
+			Err(e) => panic!("\n\tNo se ha podido leer {}: {}", path.display(), e.to_string()),
+			Ok(bytes) => println!("\n\tExito al leer los bytes {} de {}", bytes, path.display()),
+		};
 	}
-
-	// let mut new_path = path.join("a").join("b");
-	// new_path.push("c");
-	// new_path.push("archivo.txt");
-
-	// new_path.set_file_name("file.txt");
-	// match path.to_str() {
-	// 	None => panic!("No es una secuencia UTF-8"),
-	// 	Some(s) => println!("\n\tSe ha montado: {}", s),
-	// }
 }
-
+	
 fn main() {
-	println!("\n\n\tSistema de Archivos de la Facultad de Ingenieria.");
+	// Solo para limpiar la terminal
+	Command::new("clear").status().unwrap();
+	println!("\tSistema de Archivos de la Facultad de Ingenieria.");
 	println!("\n\tBienvenido\n");
 	sistema();
 }
