@@ -4,7 +4,9 @@ use std::process::Command;
 
 //Declarando los clusters como globales y mutables
 static mut CLUSTERS: Vec<u8> = Vec::new();
-// static mut CLUSTER: [u32; 0] = [];
+// Tamaño del bloque y del súperbloque
+const BLOCK_SIZE: usize = 1440;
+const SUPER_BLOCK: usize = 54;
 
 // Funcion para escribir dentro del sistema de archivos
 fn sistema() {
@@ -20,11 +22,26 @@ fn sistema() {
 	unsafe { 
 		match file.read_to_end(&mut CLUSTERS) {
 			Err(e) => panic!("\n\tNo se ha podido leer {}: {}", path.display(), e.to_string()),
-			Ok(bytes) => println!("\n\tExito al leer los bytes {} de {}", bytes, path.display()),
+			Ok(bytes) => println!("\n\tExito al leer los bytes {} de {}\n\n", bytes, path.display()),
 		};
+		
+		for (i, _) in CLUSTERS.iter().enumerate().step_by(BLOCK_SIZE) {
+			println!("\tBLOQUE ENCONTRADO: {}", i);
+			let header = &CLUSTERS[i..(i+BLOCK_SIZE)];
+			println!("Cabezal del superbloque: {}", cadenas(&header));
+		}
+	}
+
+}
+
+// Función para transformar a ASCII
+fn cadenas(data: &[u8]) -> String {
+	unsafe {
+		let s = String::from_utf8(CLUSTERS[0..8].to_vec()).expect("INVALIDO");
+		return s;
 	}
 }
-	
+
 fn main() {
 	// Solo para limpiar la terminal
 	Command::new("clear").status().unwrap();
