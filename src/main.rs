@@ -19,12 +19,12 @@ fn sistema() {
 
 	match path.to_str() {
 		None => panic!("No es una secuencia UTF-8"),
-		Some(s) => println!("La ruta es: {}", s),
+		Some(s) => println!("\n\tSe ha montado: {}", s),
 	}
 }
 
-
-
 fn main() {
+	println!("\n\n\tSistema de Archivos de la Facultad de Ingenieria.");
+	println!("\n\tBienvenido\n");
 	sistema();
 }
