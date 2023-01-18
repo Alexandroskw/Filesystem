@@ -1,8 +1,7 @@
 use std::{io::prelude::*, fs::File, path::Path/*, error::Error*/};
-//use packs::{Pack, Unpack};
 use std::process::Command;
 
-//Declarando los clusters como globales y mutables
+// Declarando los clusters como globales y mutables
 static mut CLUSTERS: Vec<u8> = Vec::new();
 // Tamaño del bloque y del súperbloque
 const BLOCK_SIZE: usize = 1440;
@@ -25,20 +24,29 @@ fn sistema() {
 			Ok(bytes) => println!("\n\tExito al leer los bytes {} de {}\n\n", bytes, path.display()),
 		};
 		
-		for (i, _) in CLUSTERS.iter().enumerate().step_by(BLOCK_SIZE) {
-			println!("\tBLOQUE ENCONTRADO: {}", i);
-			let header = &CLUSTERS[i..(i+BLOCK_SIZE)];
-			println!("Cabezal del superbloque: {}", cadenas(&header));
-		}
-	}
+		let header: &[u8] = Default::default();
 
+		for (i, _) in CLUSTERS.iter().enumerate().step_by(BLOCK_SIZE) {
+			let header_name = cadenas(&CLUSTERS[0..(i+BLOCK_SIZE)].to_vec());
+			let header_ver = cadenas2(&CLUSTERS[10..(i+BLOCK_SIZE)].to_vec());
+		}
+		println!("\tNombre: {}", cadenas(&header));
+		println!("\tVersion: {}", cadenas2(&header));
+	}
 }
 
 // Función para transformar a ASCII
-fn cadenas(data: &[u8]) -> String {
+fn cadenas(_data: &[u8]) -> String {
 	unsafe {
-		let s = String::from_utf8(CLUSTERS[0..8].to_vec()).expect("INVALIDO");
-		return s;
+		let n = String::from_utf8(CLUSTERS[0..8].to_vec()).expect("ERROR AL LEER EL SÚPER BLOQUE");
+		return n;
+	}
+}
+
+fn cadenas2(_data: &[u8]) -> String {
+	unsafe {
+		let v = String::from_utf8(CLUSTERS[10..14].to_vec()).expect("ERROR AL LEER EL SÚPER BLOQUE");
+		return v;
 	}
 }
 
