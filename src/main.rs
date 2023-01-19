@@ -2,12 +2,18 @@ use std::u8;
 use std::{io::prelude::*, fs::File, path::Path/*, error::Error*/};
 use std::process::Command;
 use structure::{structure, structure_impl};
+use std::collections::HashMap;
 
 // Declarando los clusters como globales y mutables
 static mut CLUSTERS: Vec<u8> = Vec::new();
 // Tamaño del bloque y del súperbloque
 const BLOCK_SIZE: usize = 1440;
 const SUPER_BLOCK: usize = 54;
+
+struct Record {
+	key: String,
+	val: String,
+}
 
 // Funcion para escribir dentro del sistema de archivos
 fn sistema() {
@@ -28,38 +34,50 @@ fn sistema() {
 		
 		let mut header: &[u8] = Default::default();
 
-		for (i, _) in CLUSTERS.iter().enumerate().step_by(SUPER_BLOCK) {
+		for (i, _) in CLUSTERS.iter().enumerate().step_by(BLOCK_SIZE) {
 			println!("ENCONTRADO: {}", i);
-			let _header_ = cadenas(&CLUSTERS[0..(i+SUPER_BLOCK)]);
-			// let _header_ver: (String, String) = cadenas2(&CLUSTERS[10..(i+SUPER_BLOCK)].to_vec());
+			let _header_ = cadenas(&CLUSTERS[0..(i+BLOCK_SIZE)]);
+			// let _header_ver: (String, String) = cadenas2(&CLUSTERS[10..(i+BLOCK_SIZE)].to_vec());
 
-			if _header_.contains("#+title:"){
-				print!("AQUI LLEGA");
-				header = &CLUSTERS[0..(i+SUPER_BLOCK)];
+			if _header_.contains("#+title: Proyecto 2"){
+				println!("AQUI LLEGA");
+				header = &CLUSTERS[0..(i+BLOCK_SIZE)];
 				break;
 			}
 		}
 
 		// println!("\nCONTENIDO: {}", cadenas(&header));
-		for (i, _) in header.iter().enumerate().step_by(BLOCK_SIZE) {
-			let record = &header[i..(i+BLOCK_SIZE)];
+		let mut header_rec = HashMap::new();
+		for (i, _) in header.iter().enumerate().step_by(SUPER_BLOCK) {
+			let record = &header[0..(i+SUPER_BLOCK)];
 			let rec_string = cadenas(record);
 
-			let record: Record = parse_rec(rec_string);
+			match parse_rec(rec_string){
+				Some(Record{key, val}) => {
+					// println!("{}: {}", key, val);
+					header_rec.insert(key, val);
+				}
+				None => {/*println!("AQUI NO HAY NADA")*/}
+			}
+			// let record: Record = parse_rec(rec_string);
 		}
 
-		// println!("\tNombre: {}", cadenas(&header));
+		println!("\tNOMBRE: {}", header_rec.len());
 		// println!("\tVersión, Etiqueta del vol: {:?}", cadenas2(&header));
 	}
 }
 
-fn parse_rec(r: String) -> Record {
+fn parse_rec(r: String) -> Option<Record> {
 	
 	if r.contains("-") {
 		let rec: Vec<&str> = r.splitn(2, "-").collect();
-		
+		let r = Record {key: rec[0].trim().to_string(), val: rec[1].trim().to_string()};
 
+		return Some(r);
+	}else{
+		return None;
 	}
+
 }
 
 // Funciones para transformar a ASCII
