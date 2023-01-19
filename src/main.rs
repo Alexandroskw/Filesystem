@@ -1,6 +1,7 @@
 use std::u8;
 use std::{io::prelude::*, fs::File, path::Path/*, error::Error*/};
 use std::process::Command;
+use structure::{structure, structure_impl};
 
 // Declarando los clusters como globales y mutables
 static mut CLUSTERS: Vec<u8> = Vec::new();
@@ -22,18 +23,42 @@ fn sistema() {
 	unsafe { 
 		match file.read_to_end(&mut CLUSTERS) {
 			Err(e) => panic!("\n\tNo se ha podido leer {}: {}", path.display(), e.to_string()),
-			Ok(bytes) => println!("\tExito al leer los bytes {} de {}\n\n", bytes, path.display()),
+			Ok(bytes) => println!("\tTamaño total cluster[bytes]: {}", bytes),
 		};
 		
-		let header: &[u8] = Default::default();
+		let mut header: &[u8] = Default::default();
 
-		for (i, _) in CLUSTERS.iter().enumerate().step_by(BLOCK_SIZE) {
-			let _header_name = cadenas(&CLUSTERS[0..(i+BLOCK_SIZE)].to_vec());
-			let _header_ver: (String, String) = cadenas2(&CLUSTERS[10..(i+BLOCK_SIZE)].to_vec());
+		for (i, _) in CLUSTERS.iter().enumerate().step_by(SUPER_BLOCK) {
+			println!("ENCONTRADO: {}", i);
+			let _header_ = cadenas(&CLUSTERS[0..(i+SUPER_BLOCK)]);
+			// let _header_ver: (String, String) = cadenas2(&CLUSTERS[10..(i+SUPER_BLOCK)].to_vec());
+
+			if _header_.contains("#+title:"){
+				print!("AQUI LLEGA");
+				header = &CLUSTERS[0..(i+SUPER_BLOCK)];
+				break;
+			}
 		}
 
-		println!("\tNombre: {}", cadenas(&header));
-		println!("\tVersión, Etiqueta del vol: {:?}", cadenas2(&header));
+		// println!("\nCONTENIDO: {}", cadenas(&header));
+		for (i, _) in header.iter().enumerate().step_by(BLOCK_SIZE) {
+			let record = &header[i..(i+BLOCK_SIZE)];
+			let rec_string = cadenas(record);
+
+			let record: Record = parse_rec(rec_string);
+		}
+
+		// println!("\tNombre: {}", cadenas(&header));
+		// println!("\tVersión, Etiqueta del vol: {:?}", cadenas2(&header));
+	}
+}
+
+fn parse_rec(r: String) -> Record {
+	
+	if r.contains("-") {
+		let rec: Vec<&str> = r.splitn(2, "-").collect();
+		
+
 	}
 }
 
@@ -41,10 +66,11 @@ fn sistema() {
 //Para mostrar nombre
 fn cadenas(_data: &[u8]) -> String {
 	unsafe {
-		let n = String::from_utf8(CLUSTERS[0..8].to_vec()).expect("ERROR AL LEER EL SÚPER BLOQUE");
+		let n = String::from_utf8_lossy(_data).into_owned();
 		return n;
 	}
 }
+
 //Para mostrar versión y etiqueta del volumen
 fn cadenas2(_data: &[u8]) -> (String, String) {
 	unsafe {
@@ -59,6 +85,6 @@ fn main() {
 	// Solo para limpiar la terminal
 	Command::new("clear").status().unwrap();
 	println!("\tSistema de Archivos de la Facultad de Ingeniería.");
-	println!("\n\tBienvenido\n");
+	// println!("\n\tBienvenido\n");
 	sistema();
 }
