@@ -25,6 +25,7 @@ fn sistema() {
 		Err(e) => panic!("\n\tNo se ha podido montar {}: {}", path.display(), e.to_string()),
 		Ok(file) => file,
 	};
+
 	// Para poder usar las variables estáticas mutables -y globales- se tiene que usar 'unsafe'
 	unsafe { 
 		match file.read_to_end(&mut CLUSTERS) {
@@ -36,12 +37,12 @@ fn sistema() {
 
 		for (i, _) in CLUSTERS.iter().enumerate().step_by(BLOCK_SIZE) {
 			println!("ENCONTRADO: {}", i);
-			let _header_ = cadenas(&CLUSTERS[0..(i+BLOCK_SIZE)]);
+			let _header_ = cadenas(&CLUSTERS[i..(i+BLOCK_SIZE)]);
 			// let _header_ver: (String, String) = cadenas2(&CLUSTERS[10..(i+BLOCK_SIZE)].to_vec());
 
 			if _header_.contains("#+title: Proyecto 2"){
 				println!("AQUI LLEGA");
-				header = &CLUSTERS[0..(i+BLOCK_SIZE)];
+				header = &CLUSTERS[i..(i+BLOCK_SIZE)];
 				break;
 			}
 		}
@@ -49,7 +50,7 @@ fn sistema() {
 		// println!("\nCONTENIDO: {}", cadenas(&header));
 		let mut header_rec = HashMap::new();
 		for (i, _) in header.iter().enumerate().step_by(SUPER_BLOCK) {
-			let record = &header[0..(i+SUPER_BLOCK)];
+			let record = &header[i..(i+SUPER_BLOCK)];
 			let rec_string = cadenas(record);
 
 			match parse_rec(rec_string){
@@ -83,21 +84,19 @@ fn parse_rec(r: String) -> Option<Record> {
 // Funciones para transformar a ASCII
 //Para mostrar nombre
 fn cadenas(_data: &[u8]) -> String {
-	unsafe {
-		let n = String::from_utf8_lossy(_data).into_owned();
-		return n;
-	}
+	let n = String::from_utf8_lossy(_data).into_owned();
+	return n;
 }
 
 //Para mostrar versión y etiqueta del volumen
-fn cadenas2(_data: &[u8]) -> (String, String) {
-	unsafe {
-		let v = String::from_utf8(CLUSTERS[10..14].to_vec()).expect("ERROR AL LEER EL SÚPER BLOQUE");
-		let e = String::from_utf8(CLUSTERS[20..35].to_vec()).expect("ERROR AL LEER EL SÚPER BLOQUE");
+// fn cadenas2(_data: &[u8]) -> (String, String) {
+// 	unsafe {
+// 		let v = String::from_utf8(CLUSTERS[10..14].to_vec()).expect("ERROR AL LEER EL SÚPER BLOQUE");
+// 		let e = String::from_utf8(CLUSTERS[20..35].to_vec()).expect("ERROR AL LEER EL SÚPER BLOQUE");
 
-		return (v, e);
-	}
-}
+// 		return (v, e);
+// 	}
+// }
 
 fn main() {
 	// Solo para limpiar la terminal
