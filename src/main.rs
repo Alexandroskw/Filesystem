@@ -1,6 +1,7 @@
 use std::u8;
 use std::{io::prelude::*, fs::File, path::Path/*, error::Error*/};
 use std::process::Command;
+use structure::{structure, structure_impl};
 
 // Declarando los clusters como globales y mutables
 static mut CLUSTERS: Vec<u8> = Vec::new();
@@ -53,6 +54,9 @@ fn cadenas2(_data: &[u8]) -> (String, String) {
 
 		return (v, e);
 	}
+}
+pub fn label_vol() {
+	
 }
 
 fn main() {
