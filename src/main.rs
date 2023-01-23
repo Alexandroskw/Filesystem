@@ -23,31 +23,31 @@ fn sistema() {
 	unsafe { 
 		match file.read_to_end(&mut CLUSTERS) {
 			Err(e) => panic!("\n\tNo se ha podido leer {}: {}", path.display(), e.to_string()),
-			Ok(bytes) => println!("\tExito al leer los bytes {} de {}\n\n", bytes, path.display()),
+			Ok(bytes) => println!("\tExito al leer {}[bytes] de {}\n\n", bytes, path.display()),
 		};
 		
 		let header: &[u8] = Default::default();
 
 		for (i, _) in CLUSTERS.iter().enumerate().step_by(BLOCK_SIZE) {
-			let _header_name = cadenas(&CLUSTERS[0..(i+BLOCK_SIZE)].to_vec());
-			let _header_ver: (String, String) = cadenas2(&CLUSTERS[10..(i+BLOCK_SIZE)].to_vec());
+			let _header_name = nombre(&CLUSTERS[0..(i+BLOCK_SIZE)].to_vec());
+			let _header_ver: (String, String) = _labels(&CLUSTERS[10..(i+BLOCK_SIZE)].to_vec());
 		}
 
-		println!("\tNombre: {}", cadenas(&header));
-		println!("\tVersión, Etiqueta del vol: {:?}", cadenas2(&header));
+		println!("\tNombre: {}", nombre(&header));
+		println!("\tVersión, Etiqueta del vol: {:?}", _labels(&header));
 	}
 }
 
 // Funciones para transformar a ASCII
 //Para mostrar nombre
-fn cadenas(_data: &[u8]) -> String {
+fn nombre(_data: &[u8]) -> String {
 	unsafe {
 		let n = String::from_utf8(CLUSTERS[0..8].to_vec()).expect("ERROR AL LEER EL SÚPER BLOQUE");
 		return n;
 	}
 }
 //Para mostrar versión y etiqueta del volumen
-fn cadenas2(_data: &[u8]) -> (String, String) {
+fn _labels(_data: &[u8]) -> (String, String) {
 	unsafe {
 		let v = String::from_utf8(CLUSTERS[10..14].to_vec()).expect("ERROR AL LEER EL SÚPER BLOQUE");
 		let e = String::from_utf8(CLUSTERS[20..35].to_vec()).expect("ERROR AL LEER EL SÚPER BLOQUE");
@@ -55,8 +55,13 @@ fn cadenas2(_data: &[u8]) -> (String, String) {
 		return (v, e);
 	}
 }
-pub fn label_vol() {
-	
+
+pub fn label_vol(_d: &[u8]) {
+	unsafe{
+		// Usando little-endian. Empaquetando del índice 20 al 35
+		let label_v = structure!("<s");
+		let b = label_v.pack(&CLUSTERS[20..35]);
+	}
 }
 
 fn main() {
