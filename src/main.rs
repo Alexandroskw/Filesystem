@@ -31,10 +31,12 @@ fn sistema() {
 		for (i, _) in CLUSTERS.iter().enumerate().step_by(BLOCK_SIZE) {
 			let _header_name = nombre(&CLUSTERS[0..(i+BLOCK_SIZE)].to_vec());
 			let _header_ver: (String, String) = _labels(&CLUSTERS[10..(i+BLOCK_SIZE)].to_vec());
+			let _header_label = label_vol(&CLUSTERS[40..(i+BLOCK_SIZE)].to_vec());
 		}
-
+		
 		println!("\tNombre: {}", nombre(&header));
 		println!("\tVersión, Etiqueta del vol: {:?}", _labels(&header));
+		// println!("{:?}", label_vol(&header));
 	}
 }
 
@@ -58,9 +60,10 @@ fn _labels(_data: &[u8]) -> (String, String) {
 
 pub fn label_vol(_d: &[u8]) {
 	unsafe{
-		// Usando little-endian. Empaquetando del índice 20 al 35
-		let label_v = structure!("<s");
-		let b = label_v.pack(&CLUSTERS[20..35]);
+		// Usando little-endian.
+		let s = structure!("<s");
+		// Empaquetando por referencia los clusters
+		let _b = s.pack(&CLUSTERS[20..35]).unwrap();
 	}
 }
 
