@@ -2,12 +2,13 @@ use std::process::Command;
 use std::u8;
 use std::{fs::File, io::prelude::*, path::Path /*, error::Error*/};
 use structure::{structure, structure_impl};
+use std::fmt::Display;
 
 // Declarando los clusters como globales y mutables
 static mut CLUSTERS: Vec<u8> = Vec::new();
 // Tamaño del bloque y del súperbloque
 const BLOCK_SIZE: usize = 1440;
-const SUPER_BLOCK: usize = 256;
+const SUPER_BLOCK: usize = 57;
 
 // Funcion para leer el sistema de archivos
 fn sistema() {
@@ -35,6 +36,9 @@ fn sistema() {
         };
 
         let header: &[u8] = Default::default();
+        let s = structure!("<I");
+        // Se desempaqueta a partir del índice 40 al 54
+        let s1 = s.unpack(&CLUSTERS[40..44]);
 
         for (i, _) in CLUSTERS.iter().enumerate().step_by(BLOCK_SIZE) {
             let _header_name = nombre(&CLUSTERS[0..(i + BLOCK_SIZE)].to_vec());
@@ -44,6 +48,7 @@ fn sistema() {
 
         println!("\tNombre: {}", nombre(&header));
         println!("\tVersión, Etiqueta del vol: {:?}", _labels(&header));
+        println!("\tTamaño del Cluster: {:?}", s1);
     }
 }
 
@@ -67,16 +72,16 @@ fn _labels(_data: &[u8]) -> (String, String) {
     }
 }
 
-pub fn label_vol(_d: &[u8]) -> Result<(Vec<u8>,), std::io::Error> {
+/*pub fn label_vol(_d: &[u8]) -> Result<(Vec<u8>,), std::io::Error> {
     unsafe {
         // Usando little-endian
-        let s = structure!("<S");
+        let s = structure!("<s");
         // Empaquetando en formato 'little-endian'
-        let _b = s.unpack(&CLUSTERS[40..44].to_vec());
+        let _b: Result<(Vec<u8>,), std::io::Error> = s.unpack(&CLUSTERS[40..44].to_vec());
 
 		return _b;
     }
-}
+}*/
 
 fn main() {
     // Solo para limpiar la terminal
