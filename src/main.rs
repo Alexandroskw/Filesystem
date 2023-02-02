@@ -2,7 +2,13 @@ use std::process::Command;
 use std::u8;
 use std::{fs::File, io::prelude::*, path::Path /*, error::Error*/};
 use structure::{structure, structure_impl};
-use std::fmt::Display;
+
+/*impl fmt::Display for String {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&**self, f)
+    }
+}*/
 
 // Declarando los clusters como globales y mutables
 static mut CLUSTERS: Vec<u8> = Vec::new();
@@ -36,9 +42,19 @@ fn sistema() {
         };
 
         let header: &[u8] = Default::default();
+
+        /* Para usar 'pack' y ''unpack', se tiene que importar la bliblioteca 'structure'.
+        Una vez importada, podemos hacer uso de ambas funciones. */
         let s = structure!("<I");
-        // Se desempaqueta a partir del índice 40 al 54
-        let s1 = s.unpack(&CLUSTERS[40..44]);
+        // Se desempaquetan los clusters del 40 al 57
+        let s1 = match s.unpack(&CLUSTERS[40..44].to_ascii_lowercase()) {
+            Err(_) => panic!(),
+            Ok(s1) => s1,
+        };
+        let s2 = match s.unpack(&CLUSTERS[45..49]) {
+            Err(_) => panic!(),
+            Ok(s2) => s2,
+        };
 
         for (i, _) in CLUSTERS.iter().enumerate().step_by(BLOCK_SIZE) {
             let _header_name = nombre(&CLUSTERS[0..(i + BLOCK_SIZE)].to_vec());
@@ -49,6 +65,7 @@ fn sistema() {
         println!("\tNombre: {}", nombre(&header));
         println!("\tVersión, Etiqueta del vol: {:?}", _labels(&header));
         println!("\tTamaño del Cluster: {:?}", s1);
+        println!("\tNúmero de Clusters del dir: {:?}", s2);
     }
 }
 
@@ -60,6 +77,7 @@ fn nombre(_data: &[u8]) -> String {
         return n;
     }
 }
+
 //Para mostrar versión y etiqueta del volumen
 fn _labels(_data: &[u8]) -> (String, String) {
     unsafe {
@@ -71,17 +89,6 @@ fn _labels(_data: &[u8]) -> (String, String) {
         return (v, e);
     }
 }
-
-/*pub fn label_vol(_d: &[u8]) -> Result<(Vec<u8>,), std::io::Error> {
-    unsafe {
-        // Usando little-endian
-        let s = structure!("<s");
-        // Empaquetando en formato 'little-endian'
-        let _b: Result<(Vec<u8>,), std::io::Error> = s.unpack(&CLUSTERS[40..44].to_vec());
-
-		return _b;
-    }
-}*/
 
 fn main() {
     // Solo para limpiar la terminal
