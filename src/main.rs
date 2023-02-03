@@ -1,5 +1,5 @@
 use std::process::Command;
-use std::u8;
+use std::{io, u8};
 // use std::fmt;
 use std::{fs::File, io::prelude::*, path::Path /*, error::Error*/};
 use structure::{structure, structure_impl};
@@ -50,7 +50,7 @@ fn sistema() {
         let s = structure!("<I");
         // Se desempaquetan los clusters del 40 al 54
         // Tamaño del cluster
-        let s1 = match s.unpack(&CLUSTERS[40..44].to_ascii_lowercase()) {
+        let s1 = match s.unpack(&CLUSTERS[40..44]) {
             Err(_) => panic!(),
             Ok(s1) => s1,
         };
@@ -79,6 +79,25 @@ fn sistema() {
     }
 }
 
+// Función para importar dentro del sistema de archivos
+fn import_file(){
+    Command::new("clear").status().unwrap();
+    println!("\n\tIngresa el nombre del archivo a importar: ");
+    // Se crea una cadena para leer el documento a copiar
+    let mut file = String::new();
+    // Se espera a que el ususario ingrese el nombre del documento
+    io::stdin()
+        .read_line(&mut file)
+        .expect("Error al leer la línea");
+    println!("Has ingresado: {file}");
+}
+
+// Función únicamente para mostrar el menú de opciones
+pub fn menu() {
+    println!("Ingresa una opción: ");
+    let mut o = String::new();
+}
+
 // Funciones para transformar a ASCII
 //Para mostrar nombre
 fn nombre(_data: &[u8]) -> String {
@@ -91,14 +110,13 @@ fn nombre(_data: &[u8]) -> String {
 //Para mostrar versión y etiqueta del volumen
 fn _labels(_data: &[u8]) -> (String, String) {
     unsafe {
-        let v =
-            String::from_utf8(CLUSTERS[10..14].to_vec()).expect("ERROR AL LEER EL SÚPER BLOQUE");
-        let e =
-            String::from_utf8(CLUSTERS[20..35].to_vec()).expect("ERROR AL LEER EL SÚPER BLOQUE");
+        let v = String::from_utf8(CLUSTERS[10..14].to_vec()).expect("ERROR AL LEER EL SÚPER BLOQUE");
+        let e = String::from_utf8(CLUSTERS[20..35].to_vec()).expect("ERROR AL LEER EL SÚPER BLOQUE");
 
         return (v, e);
     }
 }
+
 
 fn main() {
     // Solo para limpiar la terminal
@@ -106,4 +124,5 @@ fn main() {
     println!("\tSistema de Archivos de la Facultad de Ingeniería.");
     println!("\n\tBienvenido\n");
     sistema();
+    menu();
 }
