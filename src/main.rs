@@ -1,14 +1,16 @@
 use std::process::Command;
 use std::u8;
+// use std::fmt;
 use std::{fs::File, io::prelude::*, path::Path /*, error::Error*/};
 use structure::{structure, structure_impl};
 
-/*impl fmt::Display for String {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        fmt::Display::fmt(&**self, f)
-    }
-}*/
+// struct String(u32);
+
+// impl fmt::Display for String {
+//    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//     write!(f, "{}", self.0)
+//    }
+// }
 
 // Declarando los clusters como globales y mutables
 static mut CLUSTERS: Vec<u8> = Vec::new();
@@ -46,26 +48,34 @@ fn sistema() {
         /* Para usar 'pack' y ''unpack', se tiene que importar la bliblioteca 'structure'.
         Una vez importada, podemos hacer uso de ambas funciones. */
         let s = structure!("<I");
-        // Se desempaquetan los clusters del 40 al 57
+        // Se desempaquetan los clusters del 40 al 54
+        // Tamaño del cluster
         let s1 = match s.unpack(&CLUSTERS[40..44].to_ascii_lowercase()) {
             Err(_) => panic!(),
             Ok(s1) => s1,
         };
+        // Número de clusters del directorio
         let s2 = match s.unpack(&CLUSTERS[45..49]) {
             Err(_) => panic!(),
             Ok(s2) => s2,
+        };
+        // Número de clusters totales
+        let s3 = match s.unpack(&CLUSTERS[50..54]) {
+            Err(_) => panic!(),
+            Ok(s3) => s3,
         };
 
         for (i, _) in CLUSTERS.iter().enumerate().step_by(BLOCK_SIZE) {
             let _header_name = nombre(&CLUSTERS[0..(i + BLOCK_SIZE)].to_vec());
             let _header_ver: (String, String) = _labels(&CLUSTERS[10..(i + BLOCK_SIZE)].to_vec());
-            // let _header_label = label_vol(&CLUSTERS[40..(i + BLOCK_SIZE)].to_vec());
         }
 
+        println!("===============SUPER BLOQUE===============");
         println!("\tNombre: {}", nombre(&header));
         println!("\tVersión, Etiqueta del vol: {:?}", _labels(&header));
         println!("\tTamaño del Cluster: {:?}", s1);
         println!("\tNúmero de Clusters del dir: {:?}", s2);
+        println!("\tNúmero de Clusters totales: {:?}", s3);
     }
 }
 
