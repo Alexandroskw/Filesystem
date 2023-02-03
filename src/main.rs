@@ -1,6 +1,5 @@
 use std::process::Command;
 use std::{io, u8};
-// use std::fmt;
 use std::{fs::File, io::prelude::*, path::Path /*, error::Error*/};
 use structure::{structure, structure_impl};
 
@@ -21,7 +20,7 @@ const SUPER_BLOCK: usize = 57;
 // Funcion para leer el sistema de archivos
 fn sistema() {
     // Se crea la ruta principal al sistema de archivos
-    let path = Path::new("fiunamfs.img");
+    let path = Path::new("src/fiunamfs.img");
     // Haciendo comparación con match para montar el sistema de archivos
     let mut file = match File::open(path) {
         // Si no se ha podido montar, se muestra el aviso y el tipo de error
@@ -94,11 +93,29 @@ fn import_file(){
 
 // Función únicamente para mostrar el menú de opciones
 pub fn menu() {
-    println!("Ingresa una opción: ");
-    let mut o = String::new();
+    loop {
+        println!("Ingresa una opción>> ");
+        let mut o = String::new();
+        io::stdin()
+            .read_line(&mut o)
+            .expect("Error al leer la línea");
+        // Convirtiendo a u32 la cadena
+        let o: u32 = match o.trim().parse() {
+            Ok(n) => n,
+            Err(_) => continue,
+        };
+
+        if o == 1 {
+            import_file();
+        }
+        else {
+            println!("Opcion aun no implementada");
+        }
+        break;
+    }
 }
 
-// Funciones para transformar a ASCII
+/*==========Funciones para transformar a ASCII==========*/
 //Para mostrar nombre
 fn nombre(_data: &[u8]) -> String {
     unsafe {
@@ -116,7 +133,6 @@ fn _labels(_data: &[u8]) -> (String, String) {
         return (v, e);
     }
 }
-
 
 fn main() {
     // Solo para limpiar la terminal
