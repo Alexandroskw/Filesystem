@@ -1,4 +1,5 @@
 use std::process::Command;
+use std::ptr::null;
 use std::{io, u8};
 use std::{fs::File, io::prelude::*, path::Path /*, error::Error*/};
 use structure::{structure, structure_impl};
@@ -81,25 +82,34 @@ fn sistema() {
 // Función para importar dentro del sistema de archivos
 fn import_file(){
     Command::new("clear").status().unwrap();
-    println!("\n\tIngresa el nombre del archivo a importar: ");
-    // Se crea una cadena para leer el documento a copiar
-    let mut file = String::new();
-    // Se espera a que el ususario ingrese el nombre del documento
-    io::stdin()
-        .read_line(&mut file)
-        .expect("Error al leer la línea");
-    println!("Has ingresado: {file}");
+    loop {
+        println!("\n\tIngresa el nombre del archivo a importar: ");
+        // Se crea una cadena para leer el documento a copiar
+        let mut file = String::new();
+        // Se espera a que el ususario ingrese el nombre del documento
+        io::stdin()
+            .read_line(&mut file)
+            .expect("Error al leer la línea");
+        if file == "\n" {
+            println!("\nIngresa un nombre válido");
+        }
+        else {
+            println!("Has ingresado: {file}");
+        }
+        break;
+    }
 }
 
 // Función únicamente para mostrar el menú de opciones
 pub fn menu() {
     loop {
-        println!("Ingresa una opción>> ");
+        println!("\n1. Importar (copiar) al FS.");
+        println!("\nIngresa una opción>> ");
         let mut o = String::new();
         io::stdin()
             .read_line(&mut o)
             .expect("Error al leer la línea");
-        // Convirtiendo a u32 la cadena
+        // Convirtiendo a entero u32 la cadena
         let o: u32 = match o.trim().parse() {
             Ok(n) => n,
             Err(_) => continue,
