@@ -1,16 +1,9 @@
 use std::process::Command;
-use std::ptr::null;
 use std::{io, u8};
-use std::{fs::File, io::prelude::*, path::Path /*, error::Error*/};
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
 use structure::{structure, structure_impl};
-
-// struct String(u32);
-
-// impl fmt::Display for String {
-//    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//     write!(f, "{}", self.0)
-//    }
-// }
 
 // Declarando los clusters como globales y mutables
 static mut CLUSTERS: Vec<u8> = Vec::new();
@@ -71,31 +64,43 @@ fn sistema() {
         }
 
         println!("===============SUPER BLOQUE===============");
-        println!("\tNombre: {}", nombre(&header));
-        println!("\tVersión, Etiqueta del vol: {:?}", _labels(&header));
-        println!("\tTamaño del Cluster: {:?}", s1);
-        println!("\tNúmero de Clusters del dir: {:?}", s2);
-        println!("\tNúmero de Clusters totales: {:?}", s3);
+        println!("Nombre: {}", nombre(&header));
+        println!("Versión, Etiqueta del vol: {:?}", _labels(&header));
+        println!("Tamaño del Cluster: {:?}", s1);
+        println!("Número de Clusters del dir: {:?}", s2);
+        println!("Número de Clusters totales: {:?}", s3);
+        println!("==========================================");
     }
 }
 
-// Función para importar dentro del sistema de archivos
-fn import_file(){
+// Función para "importar" del sistema de archivos a la computadora
+fn import_file() {
     Command::new("clear").status().unwrap();
+    
     loop {
         println!("\n\tIngresa el nombre del archivo a importar: ");
         // Se crea una cadena para leer el documento a copiar
         let mut file = String::new();
         // Se espera a que el ususario ingrese el nombre del documento
         io::stdin()
-            .read_line(&mut file)
-            .expect("Error al leer la línea");
+        .read_line(&mut file)
+        .expect("Error al leer la línea");
         if file == "\n" {
             println!("\nIngresa un nombre válido");
         }
         else {
             println!("Has ingresado: {file}");
         }
+        // Se 'abre' el archivo introducido por el usuario
+        let file = File::open(file);
+        // {
+        //     Err(e) => panic!("\nNo se ha podido abrir el archivo o no existe."),
+        //     Ok(file) => file,
+        // };
+        // let mut path = match File::open(path) {
+        //     Err(e) => panic!("\nNo se ha podido montar {}: {}", path.display(), e.to_string()),
+        //     Ok(path) => path
+        // };
         break;
     }
 }
