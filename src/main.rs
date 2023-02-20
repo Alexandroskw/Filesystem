@@ -9,7 +9,7 @@ use structure::{structure, structure_impl};
 static mut CLUSTERS: Vec<u8> = Vec::new();
 // Tamaño del bloque y del súperbloque
 const BLOCK_SIZE: usize = 1440;
-const SUPER_BLOCK: usize = 57;
+const SUPER_BLOCK: usize = 64;
 
 // Funcion para leer el sistema de archivos
 fn sistema() {
@@ -40,24 +40,9 @@ fn sistema() {
 
         /* Para usar 'pack' y ''unpack', se tiene que importar la bliblioteca 'structure'.
         Una vez importada, podemos hacer uso de ambas funciones. */
-        let s = structure!("<I");
         // Se desempaquetan los clusters del 40 al 54
-        // Tamaño del cluster
-        let s1 = match s.unpack(&CLUSTERS[40..44]) {
-            Err(_) => panic!(),
-            Ok(s1) => s1,
-        };
-        // Número de clusters del directorio
-        let s2 = match s.unpack(&CLUSTERS[45..49]) {
-            Err(_) => panic!(),
-            Ok(s2) => s2,
-        };
-        // Número de clusters totales
-        let s3 = match s.unpack(&CLUSTERS[50..54]) {
-            Err(_) => panic!(),
-            Ok(s3) => s3,
-        };
-
+        let s = structure!("<I");
+        
         for (i, _) in CLUSTERS.iter().enumerate().step_by(BLOCK_SIZE) {
             let _header_name = nombre(&CLUSTERS[0..(i + BLOCK_SIZE)].to_vec());
             let _header_ver: (String, String) = _labels(&CLUSTERS[10..(i + BLOCK_SIZE)].to_vec());
@@ -66,15 +51,27 @@ fn sistema() {
         println!("===============SUPER BLOQUE===============");
         println!("Nombre: {}", nombre(&header));
         println!("Versión, Etiqueta del vol: {:?}", _labels(&header));
-        println!("Tamaño del Cluster: {:?}", s1);
-        println!("Número de Clusters del dir: {:?}", s2);
-        println!("Número de Clusters totales: {:?}", s3);
+        // Tamaño del cluster
+        let s1 = match s.unpack(&CLUSTERS[40..44]) {
+            Err(_) => panic!(),
+            Ok(s1) => println!("Tamaño del Cluster: {:?}", s1),
+        };
+        // Número de clusters del directorio
+        let s2 = match s.unpack(&CLUSTERS[45..49]) {
+            Err(_) => panic!(),
+            Ok(s2) => println!("Número de Clusters del dir: {:?}", s2),
+        };
+        // Número de clusters totales
+        let s3 = match s.unpack(&CLUSTERS[50..54]) {
+            Err(_) => panic!(),
+            Ok(s3) => println!("Número de Clusters totales: {:?}", s3),
+        };
         println!("==========================================");
     }
 }
 
 // Función para "importar" del sistema de archivos a la computadora
-fn import_file() {
+fn import_file() -> ! {
     Command::new("clear").status().unwrap();
     
     loop {
@@ -83,25 +80,29 @@ fn import_file() {
         let mut file = String::new();
         // Se espera a que el ususario ingrese el nombre del documento
         io::stdin()
-        .read_line(&mut file)
-        .expect("Error al leer la línea");
-        if file == "\n" {
+            .read_line(&mut file)
+            .expect("Error al leer la línea");
+        // Se espera a que el usuario no dé una cadena vacía
+        if !file.is_empty() == true {
             println!("\nIngresa un nombre válido");
         }
-        else {
-            println!("Has ingresado: {file}");
-        }
+        // else {
+        //     println!("Has ingresado: {file}");
+        // }
         // Se 'abre' el archivo introducido por el usuario
-        let file = File::open(file);
-        // {
-        //     Err(e) => panic!("\nNo se ha podido abrir el archivo o no existe."),
-        //     Ok(file) => file,
-        // };
-        // let mut path = match File::open(path) {
-        //     Err(e) => panic!("\nNo se ha podido montar {}: {}", path.display(), e.to_string()),
-        //     Ok(path) => path
-        // };
-        break;
+        let file = match File::open(file) {
+            // Si el archivo no existe aparece la alerta que indica que no existe o que no se ha podido abrir
+            Err(e) => panic!("\nNo se ha podido abrir el archivo o no existe."),
+            Ok(file) => file,
+        };
+
+        // Para definir los clusters totales
+        // let c: u32 = 4;
+        
+        // for i in 0..SUPER_BLOCK {
+
+        // }
+        // break;
     }
 }
 
@@ -114,7 +115,7 @@ pub fn menu() {
         io::stdin()
             .read_line(&mut o)
             .expect("Error al leer la línea");
-        // Convirtiendo a entero u32 la cadena
+        // Convirtiendo a entero u32 la cadena y cortando "\n" del final
         let o: u32 = match o.trim().parse() {
             Ok(n) => n,
             Err(_) => continue,
@@ -126,7 +127,7 @@ pub fn menu() {
         else {
             println!("Opcion aun no implementada");
         }
-        break;
+        // break;
     }
 }
 
