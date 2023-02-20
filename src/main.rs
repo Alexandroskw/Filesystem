@@ -52,18 +52,18 @@ fn sistema() {
         println!("Nombre: {}", nombre(&header));
         println!("Versión, Etiqueta del vol: {:?}", _labels(&header));
         // Tamaño del cluster
-        let s1 = match s.unpack(&CLUSTERS[40..44]) {
-            Err(_) => panic!(),
+        let _s1 = match s.unpack(&CLUSTERS[40..44]) {
+            Err(_) => panic!("ERROR"),
             Ok(s1) => println!("Tamaño del Cluster: {:?}", s1),
         };
         // Número de clusters del directorio
-        let s2 = match s.unpack(&CLUSTERS[45..49]) {
-            Err(_) => panic!(),
+        let _s2 = match s.unpack(&CLUSTERS[45..49]) {
+            Err(_) => panic!("ERROR"),
             Ok(s2) => println!("Número de Clusters del dir: {:?}", s2),
         };
         // Número de clusters totales
-        let s3 = match s.unpack(&CLUSTERS[50..54]) {
-            Err(_) => panic!(),
+        let _s3 = match s.unpack(&CLUSTERS[50..54]) {
+            Err(_) => panic!("ERROR"),
             Ok(s3) => println!("Número de Clusters totales: {:?}", s3),
         };
         println!("==========================================");
@@ -90,26 +90,25 @@ fn import_file() -> ! {
         //     println!("Has ingresado: {file}");
         // }
         // Se 'abre' el archivo introducido por el usuario
-        let file = match File::open(file) {
+        let _user_file = match File::open(file) {
             // Si el archivo no existe aparece la alerta que indica que no existe o que no se ha podido abrir
-            Err(e) => panic!("\nNo se ha podido abrir el archivo o no existe."),
+            Err(_e) => panic!("\nNo se ha podido abrir el archivo o no existe."),
             Ok(file) => file,
         };
+        let _c: i32 = 0;
 
-        // Para definir los clusters totales
-        // let c: u32 = 4;
-        
-        // for i in 0..SUPER_BLOCK {
-
-        // }
         // break;
     }
 }
-
+// Únicamente para salir del programa
+fn salir() {
+    std::process::exit(1);
+}
 // Función únicamente para mostrar el menú de opciones
 pub fn menu() {
     loop {
         println!("\n1. Importar (copiar) al FS.");
+        println!("5. Salir.");
         println!("\nIngresa una opción>> ");
         let mut o = String::new();
         io::stdin()
@@ -123,6 +122,9 @@ pub fn menu() {
 
         if o == 1 {
             import_file();
+        }
+        else if o == 5 {
+            salir();
         }
         else {
             println!("Opcion aun no implementada");
