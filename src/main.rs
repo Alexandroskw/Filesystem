@@ -82,20 +82,10 @@ fn import_file() -> ! {
         io::stdin()
             .read_line(&mut file)
             .expect("Error al leer la línea");
-        // Se espera a que el usuario no dé una cadena vacía
-        if !file.is_empty() == true {
-            println!("\nIngresa un nombre válido");
-        }
-        // else {
-        //     println!("Has ingresado: {file}");
-        // }
+        
         // Se 'abre' el archivo introducido por el usuario
-        let _user_file = match File::open(file) {
-            // Si el archivo no existe aparece la alerta que indica que no existe o que no se ha podido abrir
-            Err(_e) => panic!("\nNo se ha podido abrir el archivo o no existe."),
-            Ok(file) => file,
-        };
-        let _c: i32 = 0;
+        let mut _user_file = Path::new(&file);
+        assert!(Path::new(&file).try_exists().is_err(), "NO EXISTE {}", &file);
 
         // break;
     }
