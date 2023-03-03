@@ -1,5 +1,5 @@
 use std::process::Command;
-use std::{io, u8};
+use std::{io, u8, fs};
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
@@ -9,7 +9,7 @@ use structure::{structure, structure_impl};
 static mut CLUSTERS: Vec<u8> = Vec::new();
 // Tamaño del bloque y del súperbloque
 const BLOCK_SIZE: usize = 1440;
-const SUPER_BLOCK: usize = 64;
+// const SUPER_BLOCK: usize = 64;
 
 // Funcion para leer el sistema de archivos
 fn sistema() {
@@ -70,12 +70,18 @@ fn sistema() {
     }
 }
 
+fn search_file() {
+    for i in fs::read_dir("src").unwrap() {
+        println!("{}", i.unwrap().path().display());
+    }
+}
+
 // Función para "importar" del sistema de archivos a la computadora
-fn import_file() -> ! {
+fn import_file() {
     Command::new("clear").status().unwrap();
     
     loop {
-        println!("\n\tIngresa el nombre del archivo a importar: ");
+        println!("\nIngresa el nombre del archivo a importar: ");
         // Se crea una cadena para leer el documento a copiar
         let mut file = String::new();
         // Se espera a que el ususario ingrese el nombre del documento
@@ -84,16 +90,19 @@ fn import_file() -> ! {
             .expect("Error al leer la línea");
         
         // Se 'abre' el archivo introducido por el usuario
-        let mut _user_file = Path::new(&file);
-        assert!(Path::new(&file).try_exists().is_err(), "NO EXISTE {}", &file);
-
-        // break;
+        // let user_file = File::open(&mut file);
+        // Prueba que existe el archivo. Si no existe sale del programa
+        // assert!(File::open(file).is_ok(), "NO EXISTE EL ARCHIVO.");
+        // if File::open(file).is_ok() == true {
+        //     println!("EXISTE");
+        // }
+        // else {
+        //     println!("NO ESTA BIEN");
+        // }
+        let data_user = search_file();
     }
 }
-// Únicamente para salir del programa
-fn salir() {
-    std::process::exit(1);
-}
+
 // Función únicamente para mostrar el menú de opciones
 pub fn menu() {
     loop {
@@ -114,7 +123,7 @@ pub fn menu() {
             import_file();
         }
         else if o == 5 {
-            salir();
+            std::process::exit(1);
         }
         else {
             println!("Opcion aun no implementada");
