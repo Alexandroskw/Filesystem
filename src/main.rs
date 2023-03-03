@@ -1,5 +1,5 @@
 use std::process::Command;
-use std::{io, u8, fs};
+use std::{io, u8};
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
@@ -70,14 +70,23 @@ fn sistema() {
     }
 }
 
-fn search_file() {
-    for i in fs::read_dir("src").unwrap() {
-        println!("{}", i.unwrap().path().display());
+//Función para buscar el archivo en el directorio
+fn search_file(file_user: &str) {
+    let path: &Path = Path::new(&file_user);
+
+    if path.exists() {
+        println!("EXISTE");
+    }
+    else {
+        println!("NO EXISTE");
+        // for i in fs::read_dir("src").unwrap() {
+        //     println!("{}", i.unwrap().path().display());
+        // }
     }
 }
 
 // Función para "importar" del sistema de archivos a la computadora
-fn import_file() {
+fn import_file() -> ! {
     Command::new("clear").status().unwrap();
     
     loop {
@@ -88,18 +97,11 @@ fn import_file() {
         io::stdin()
             .read_line(&mut file)
             .expect("Error al leer la línea");
-        
-        // Se 'abre' el archivo introducido por el usuario
-        // let user_file = File::open(&mut file);
-        // Prueba que existe el archivo. Si no existe sale del programa
-        // assert!(File::open(file).is_ok(), "NO EXISTE EL ARCHIVO.");
-        // if File::open(file).is_ok() == true {
-        //     println!("EXISTE");
-        // }
-        // else {
-        //     println!("NO ESTA BIEN");
-        // }
-        let data_user = search_file();
+        // Borrando '\n' con 'trim()' para que encuentre correctamente el archivo dado por el usuario
+        //No se hace uso del 'préstamo' (Borrowing) ya que al terminar la siguiente línea, se sale de su alcance (scope)
+        let file_trimmed: &str = file.trim();
+
+        search_file(file_trimmed);
     }
 }
 
