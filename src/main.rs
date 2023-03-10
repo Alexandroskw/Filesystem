@@ -1,5 +1,5 @@
 use std::process::Command;
-use std::{io, u8};
+use std::{io, u8, fs};
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
@@ -75,18 +75,19 @@ fn search_file(file_user: &str) {
     let path: &Path = Path::new(&file_user);
 
     if path.exists() {
-        println!("EXISTE");
+        println!("EXISTE EL ARCHIVO: {}", path.display());
     }
     else {
-        println!("NO EXISTE");
-        // for i in fs::read_dir("src").unwrap() {
-        //     println!("{}", i.unwrap().path().display());
-        // }
+        println!("\nRevisa que esté bien escrito o exista el archivo: '{}'", path.display());
+        // Si el archivo no existe, se entra al ciclo para revisar que exista el archivo dentro de la carpeta
+        for i in fs::read_dir("./src").unwrap() {
+            println!("{}", i.unwrap().path().display());
+        }
     }
 }
 
-// Función para "importar" del sistema de archivos a la computadora
-fn import_file() -> ! {
+// Función para "importar" de la computadora al sistema de archivos
+fn import_file() {
     Command::new("clear").status().unwrap();
     
     loop {
