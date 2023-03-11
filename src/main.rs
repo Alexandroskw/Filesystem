@@ -71,11 +71,15 @@ fn sistema() {
 }
 
 //Función para buscar el archivo en el directorio
-fn search_file(file_user: &str) {
+fn search_file(file_user: &str) -> bool {
     let path: &Path = Path::new(&file_user);
+    // Cambiando de tipos para extraer únicamente el nombre del archivo dado por el usuario
+    let user_filename: &std::ffi::OsStr = path.file_name().unwrap();
 
-    if path.exists() {
-        println!("EXISTE EL ARCHIVO: {}", path.display());
+    if !user_filename.is_empty() {
+        println!("Existe el archivo: '{}'", path.display());
+
+        return true;
     }
     else {
         println!("\nRevisa que esté bien escrito o exista el archivo: '{}'", path.display());
@@ -83,6 +87,8 @@ fn search_file(file_user: &str) {
         for i in fs::read_dir("./src").unwrap() {
             println!("{}", i.unwrap().path().display());
         }
+
+        return false;
     }
 }
 
@@ -99,10 +105,16 @@ fn import_file() {
             .read_line(&mut file)
             .expect("Error al leer la línea");
         // Borrando '\n' con 'trim()' para que encuentre correctamente el archivo dado por el usuario
-        //No se hace uso del 'préstamo' (Borrowing) ya que al terminar la siguiente línea, se sale de su alcance (scope)
-        let file_trimmed: &str = file.trim();
+        let file: &str = file.trim();
 
-        search_file(file_trimmed);
+        let file_import: bool = search_file(file);
+
+        if file_import == true {
+            println!("SIGO EXISTIENDO");
+        }
+        else {
+            println!("SIGO SIN EXISTIR");
+        }
     }
 }
 
